@@ -21,10 +21,10 @@ int main(void) {
 
   for (size_t i = 2; i < N; ++i) {
     if (array[i] == false) {
-      uint32_t multiples = i + i;
-      while (multiples < N) {
-        array[multiples] = true;
-        multiples += i;
+      uint32_t composite = i + i;
+      while (composite < N) {
+        array[composite] = true;
+        composite += i;
       }
     }
   }
