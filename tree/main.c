@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -31,6 +32,20 @@ void tree_insert(TreeNode **root, uint64_t value) {
   }
 }
 
+bool tree_find(TreeNode **root, uint64_t value) {
+  if (*root != NULL) {
+    if ((*root)->value == value) {
+      return true;
+    }
+    if ((*root)->value < value) {
+      return tree_find(&(*root)->right, value);
+    } else if ((*root)->value > value) {
+      return tree_find(&(*root)->left, value);
+    }
+  }
+  return false;
+}
+
 void _tree_dump_r(FILE *file, TreeNode *node) {
   if (node != NULL) {
     if (node->left) {
@@ -53,14 +68,29 @@ void tree_dump(FILE *file, TreeNode *node) {
   fprintf(file, "}\n");
 }
 
+void tree_destroy(TreeNode **root) {
+  if (*root == NULL) {
+    return;
+  }
+  tree_destroy(&(*root)->left);
+  tree_destroy(&(*root)->right);
+  free(*root);
+}
+
 int main(void) {
   TreeNode *root = NULL;
 
-  for (int i = 0; i < 100; ++i) {
-    tree_insert(&root, rand() % 1000);
+  tree_insert(&root, 420);
+  for (int i = 0; i < 35; ++i) {
+    tree_insert(&root, rand() % 100);
   }
+
+  assert(tree_find(&root, 420) == true);
+  assert(tree_find(&root, 1000) == false);
 
   FILE *file = fopen("tree.dot", "w");
   tree_dump(file, root);
   fclose(file);
+
+  tree_destroy(&root);
 }
