@@ -32,6 +32,40 @@ void tree_insert(TreeNode **root, uint64_t value) {
   }
 }
 
+TreeNode *tree_find_min(TreeNode **root) {
+  return (*root)->left ? tree_find_min(&(*root)->left) : *root;
+}
+
+void tree_delete(TreeNode **root, uint64_t value) {
+  if (*root == NULL) {
+    return;
+  }
+
+  if ((*root)->value < value) {
+    tree_delete(&(*root)->right, value);
+  } else if ((*root)->value > value) {
+    tree_delete(&(*root)->left, value);
+  } else {
+    if (!(*root)->left && !(*root)->right) {
+      // Leaf
+      TreeNode *temp = *root;
+      *root = NULL;
+      free(temp);
+    } else if ((*root)->left && (*root)->right) {
+      // Two children i dont touch that shit with a 20 inch pole
+      TreeNode *temp = tree_find_min(&(*root)->right);
+      (*root)->value = temp->value;
+      tree_delete(&(*root)->right, temp->value);
+      printf("Deleting %lld\n", value);
+    } else if ((*root)->left || (*root)->right) {
+      // Only left or right
+      TreeNode *temp = *root;
+      *root = (*root)->left ? (*root)->left : (*root)->right;
+      free(temp);
+    }
+  }
+}
+
 bool tree_find(TreeNode **root, uint64_t value) {
   if (*root != NULL) {
     if ((*root)->value == value) {
@@ -80,13 +114,15 @@ void tree_destroy(TreeNode **root) {
 int main(void) {
   TreeNode *root = NULL;
 
-  tree_insert(&root, 420);
-  for (int i = 0; i < 35; ++i) {
+  for (int i = 0; i < 45; ++i) {
     tree_insert(&root, rand() % 100);
   }
 
-  assert(tree_find(&root, 420) == true);
   assert(tree_find(&root, 1000) == false);
+  assert(tree_find_min(&root)->value == 0);
+  tree_delete(&root, 18);
+  tree_delete(&root, 27);
+  tree_delete(&root, 5);
 
   FILE *file = fopen("tree.dot", "w");
   tree_dump(file, root);
