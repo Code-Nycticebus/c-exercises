@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ARRAY_SIZE 10
+#define ARRAY_SIZE 100000
 
 void sort(int *array, size_t size) {
   for (size_t i = 0; i < size; i++) {
@@ -20,12 +20,13 @@ int main(void) {
   srand(time(NULL));
   int array[ARRAY_SIZE] = {0};
   for (size_t i = 0; i < ARRAY_SIZE; i++) {
-    array[i] = rand();
+    array[i] = rand() % ARRAY_SIZE;
   }
 
   sort(array, ARRAY_SIZE);
 
-  for (size_t i = 0; i < ARRAY_SIZE; i++) {
-    printf("%ld: %d\n", i, array[i]);
-  }
+  // for (size_t i = 0; i < ARRAY_SIZE; i++) {
+  //   printf("%ld: %d\n", i, array[i]);
+  // }
+  printf("Done\n");
 }
