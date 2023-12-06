@@ -32,8 +32,9 @@ void print_array(uint32_t *array, size_t n) {
 }
 
 int main(void) {
-  uint32_t array[] = {6, 5, 9, 7, 2};
+  uint32_t array[] = {6, 5, 9, 7, 2}; // NOLINT
   const size_t array_size = sizeof(array) / sizeof(array[0]);
   sort(array, array_size);
   print_array(array, array_size);
 }
+

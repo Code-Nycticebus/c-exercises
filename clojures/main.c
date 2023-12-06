@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -13,7 +14,7 @@ typedef struct {
 
 Clojure clojure(void *fn, void *args) {
   return (Clojure){
-      .fn = fn,
+      .fn = (clojureFn)fn,
       .args = args,
       .called = false,
       .result = 0,
@@ -35,6 +36,6 @@ typedef struct {
 int64_t function(Args *args) { return args->a + args->b; }
 
 int main(void) {
-  Clojure c = clojure(function, (Args[]){{.a = 399, .b = 21}});
-  printf("%lld\n", call(&c));
+  Clojure c = clojure(function, (Args[]){{.a = 399, .b = 21}}); // NOLINT
+  printf("%" PRIu64 "\n", call(&c));
 }

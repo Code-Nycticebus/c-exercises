@@ -2,17 +2,21 @@
 #include "option.h"
 
 #define T char
-#include "option.h"
+#include "option.h" // NOLINT
 
 #include <stdio.h>
 
-Option(int) validate(int i) { return i < 20 ? Some(int, i) : None(int); }
+#define MAX_VALUE 20
+
+Option(int) validate(int i) { return i < MAX_VALUE ? Some(int, i) : None(int); }
 
 int main(void) {
-  Option(int) o = validate(10);
+  const int input = 10;
+  Option(int) o = validate(input);
   int i = Unwrap(int, o);
 
   OptionPtr(char) o2 = SomePtr(char, "Fuck");
 
   printf("%d\n", i);
+  printf("%s\n", UnwrapPtr(char, o2));
 }

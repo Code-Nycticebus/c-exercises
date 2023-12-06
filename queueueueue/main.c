@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -64,7 +65,7 @@ int main(void) {
   }
 
   for (size_t i = 0; i < first_step; ++i) {
-    printf("  %d: %lld\n", i, dequeue(&queue));
+    printf("  %zu: %" PRIu64 "\n", i, dequeue(&queue));
   }
 
   printf("Second:\n");
@@ -74,7 +75,7 @@ int main(void) {
   }
 
   for (size_t i = 0; i < second_step - first_step; ++i) {
-    printf("  %d: %lld\n", i, dequeue(&queue));
+    printf("  %zu: %" PRIu64 "\n", i, dequeue(&queue));
   }
 
   printf("Empty:\n");

@@ -18,6 +18,6 @@ int main(void) {
   fgets(user_input, MAX_INPUT, stdin);
   size_t len = strlen(user_input) - 1; // truncate the newline
   bool is_palindrome = palindrome(len, user_input);
-  printf("\"%.*s\" %s a palindrome\n", len, user_input,
+  printf("\"%.*s\" %s a palindrome\n", (int)len, user_input,
          is_palindrome ? "is" : "is not");
 }

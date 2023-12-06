@@ -29,8 +29,8 @@ int main(void) {
   Stack stack;
   stack_init(&stack);
 
-  stack_push(&stack, 123);
-  stack_push(&stack, 321);
+  stack_push(&stack, 123); // NOLINT
+  stack_push(&stack, 321); // NOLINT
 
   StackItem item;
   item = stack_pop(&stack);
@@ -49,3 +49,4 @@ int main(void) {
     assert(item == first_step - i);
   }
 }
+

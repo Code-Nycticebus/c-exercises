@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BASE 10
+
 int32_t input(const char *msg) {
 #define MAX_INPUT 11
   if (msg) {
@@ -11,7 +13,7 @@ int32_t input(const char *msg) {
   }
   char user_input_str[MAX_INPUT];
   fgets(user_input_str, MAX_INPUT, stdin);
-  return strtol(user_input_str, NULL, 10);
+  return strtol(user_input_str, NULL, BASE);
 #undef MAX_INPUT
 }
 
@@ -31,7 +33,7 @@ int main(void) {
 
   for (size_t i = 2; i < N; ++i) {
     if (array[i] == false) {
-      printf("%d\n", i);
+      printf("%zu\n", i);
     }
   }
 

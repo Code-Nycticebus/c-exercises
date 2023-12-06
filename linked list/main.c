@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,7 +69,7 @@ NodeValue ll_pop_back(LinkedList *ll) {
 
 void ll_print(LinkedList *ll) {
   for (Node *next = ll->start; next != NULL; next = next->next) {
-    printf("%lld\n", next->value);
+    printf("%" PRIu64 "\n", next->value);
   }
 }
 
@@ -78,10 +79,11 @@ int main(void) {
   ll_push(&ll, 2);
   ll_push(&ll, 3);
 
-  ll_push_back(&ll, 120);
+  ll_push_back(&ll, 120); // NOLINT
 
-  printf("pop: %lld\n", ll_pop(&ll));
-  printf("pop: %lld\n", ll_pop_back(&ll));
+  printf("pop: %" PRIu64 "\n", ll_pop(&ll));
+  printf("pop: %" PRIu64 "\n", ll_pop_back(&ll));
 
   ll_print(&ll);
 }
+
