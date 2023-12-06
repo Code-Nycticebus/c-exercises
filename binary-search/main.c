@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -6,10 +7,11 @@ const uint8_t *binary_search_r(size_t size, const uint8_t array[size],
   if (size == 1) {
     return array[0] == search_value ? &array[0] : NULL;
   }
-  size_t middle_idx = (size % 2 ? size + 1 : size) / 2;
+  size_t middle_idx = size / 2;
   return array[middle_idx] == search_value ? &array[middle_idx]
          : array[middle_idx] < search_value
-             ? binary_search_r(middle_idx, &array[middle_idx], search_value)
+             ? binary_search_r(size % 2 == 0 ? middle_idx : middle_idx + 1,
+                               &array[middle_idx], search_value)
              : binary_search_r(middle_idx, &array[0], search_value);
 }
 
@@ -22,7 +24,7 @@ int binary_search(size_t size, const uint8_t array[size],
 int main(void) {
   const uint8_t array[] = {
       1,  2,  7,  8,  9,   10,  22,  23,  38,  55,
-      56, 67, 70, 98, 101, 160, 199, 200, 250, 255,
+      56, 67, 70, 98, 101, 160, 199, 200, 250, 251,
   };
   const size_t size = sizeof(array) / sizeof(array[0]);
 
