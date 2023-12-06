@@ -3,8 +3,8 @@
 
 const uint8_t *binary_search_r(size_t size, const uint8_t array[size],
                                uint8_t search_value) {
-  if (size == 0) {
-    return NULL;
+  if (size == 1) {
+    return array[0] == search_value ? &array[0] : NULL;
   }
   size_t middle_idx = (size % 2 ? size + 1 : size) / 2;
   return array[middle_idx] == search_value ? &array[middle_idx]
@@ -25,13 +25,12 @@ int main(void) {
       56, 67, 70, 98, 101, 160, 199, 200, 250, 255,
   };
   const size_t size = sizeof(array) / sizeof(array[0]);
-  const uint8_t search_value = 55;
 
-  const int searchindex = binary_search(size, array, search_value);
-  if (searchindex != -1) {
-    printf("element with value %u is at index %d\n", search_value, searchindex);
-  } else {
-    printf("element with value %u not found!\n", search_value);
+  for (uint8_t i = 0; i < UINT8_MAX; i++) {
+    const int searchindex = binary_search(size, array, i);
+    if (searchindex != -1) {
+      printf("element with value %u is at index %d\n", i, searchindex);
+    }
   }
   return 0;
 }
