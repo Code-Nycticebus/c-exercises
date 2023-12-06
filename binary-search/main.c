@@ -6,11 +6,9 @@ const uint8_t *binary_search_r(size_t size, const uint8_t array[size],
   if (size == 0) {
     return NULL;
   }
-  uint32_t middle_idx = size / 2;
-  if (array[middle_idx] == search_value) {
-    return &array[middle_idx];
-  }
-  return array[middle_idx] < search_value
+  size_t middle_idx = (size % 2 ? size + 1 : size) / 2;
+  return array[middle_idx] == search_value ? &array[middle_idx]
+         : array[middle_idx] < search_value
              ? binary_search_r(middle_idx, &array[middle_idx], search_value)
              : binary_search_r(middle_idx, &array[0], search_value);
 }
@@ -27,7 +25,7 @@ int main(void) {
       56, 67, 70, 98, 101, 160, 199, 200, 250, 255,
   };
   const size_t size = sizeof(array) / sizeof(array[0]);
-  const uint8_t search_value = 70;
+  const uint8_t search_value = 55;
 
   const int searchindex = binary_search(size, array, search_value);
   if (searchindex != -1) {
