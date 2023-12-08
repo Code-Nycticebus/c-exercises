@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -56,7 +57,7 @@ void tree_delete(TreeNode **root, uint64_t value) {
       TreeNode *temp = tree_find_min(&(*root)->right);
       (*root)->value = temp->value;
       tree_delete(&(*root)->right, temp->value);
-      printf("Deleting %lld\n", value);
+      printf("Deleting %" PRIu64 "\n", value);
     } else if ((*root)->left || (*root)->right) {
       // Only left or right
       TreeNode *temp = *root;
@@ -73,7 +74,8 @@ bool tree_find(TreeNode **root, uint64_t value) {
     }
     if ((*root)->value < value) {
       return tree_find(&(*root)->right, value);
-    } else if ((*root)->value > value) {
+    }
+    if ((*root)->value > value) {
       return tree_find(&(*root)->left, value);
     }
   }
@@ -83,15 +85,17 @@ bool tree_find(TreeNode **root, uint64_t value) {
 void _tree_dump_r(FILE *file, TreeNode *node) {
   if (node != NULL) {
     if (node->left) {
-      fprintf(file, "\t%lld -> %lld\n", node->value, node->left->value);
+      fprintf(file, "\t%" PRIu64 " -> %" PRIu64 "\n", node->value,
+              node->left->value);
       _tree_dump_r(file, node->left);
     }
     if (node->right) {
-      fprintf(file, "\t%lld -> %lld\n", node->value, node->right->value);
+      fprintf(file, "\t%" PRIu64 " -> %" PRIu64 "\n", node->value,
+              node->right->value);
       _tree_dump_r(file, node->right);
     }
     if (!node->right && !node->left) {
-      fprintf(file, "\t%lld\n", node->value);
+      fprintf(file, "\t%" PRIu64 "\n", node->value);
     }
   }
 }
@@ -114,15 +118,17 @@ void tree_destroy(TreeNode **root) {
 int main(void) {
   TreeNode *root = NULL;
 
-  for (int i = 0; i < 45; ++i) {
-    tree_insert(&root, rand() % 100);
+  const size_t number_count = 45;
+  const size_t number_max = 100;
+  for (size_t i = 0; i < number_count; ++i) {
+    tree_insert(&root, rand() % number_max);
   }
 
   assert(tree_find(&root, 1000) == false);
   assert(tree_find_min(&root)->value == 0);
-  tree_delete(&root, 18);
-  tree_delete(&root, 27);
-  tree_delete(&root, 5);
+  tree_delete(&root, 18); // NOLINT
+  tree_delete(&root, 27); // NOLINT
+  tree_delete(&root, 5);  // NOLINT
 
   FILE *file = fopen("tree.dot", "w");
   tree_dump(file, root);
