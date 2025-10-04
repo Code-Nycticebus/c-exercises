@@ -1,7 +1,16 @@
 #include<stdio.h>
 #include<stdint.h>
 
-#include"entity.h"
+typedef struct {
+	void (*defend)(EntityBase* entity, uint8_t dmg);
+	void (*attack)(EntityBase* entity, EntityBase* target);
+} EntityInterface;
+
+typedef struct {
+	const EntityInterface* interface;
+	uint8_t hp;
+	uint8_t dmg;
+} EntityBase;
 
 
 /* GOBLIN */

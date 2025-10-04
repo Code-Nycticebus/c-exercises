@@ -2,8 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-const uint8_t *binary_search_r(size_t size, const uint8_t array[size],
-                               uint8_t search_value) {
+const uint8_t *binary_search_r(size_t size, const uint8_t array[size], uint8_t search_value) {
   if (size == 1) {
     return array[0] == search_value ? &array[0] : NULL;
   }
