@@ -1,106 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-typedef enum {
-  UNIQUE_OK,
-  UNIQUE_FREE,
-  UNIQUE_MOVED,
-  UNIQUE_USED,
-} UniqueState;
+// Unique pointers are there to signal ownership. Movement of Unique pointers is movement of
+// ownership. The taker is now responsible for calling free...
 
-typedef struct {
-  UniqueState state;
-  void *data;
-  const char *file;
-  int line;
-} UniquePtr;
+#define _unique_check(ptr, action)                                                                 \
+    ((ptr).moved == true                                                                           \
+         ? (printf("%s:%d: '%s' but already moved!\n", __FILE__, __LINE__, action), abort())       \
+         : (void)0)
 
-UniquePtr make_unique(void *data) {
-  return (UniquePtr){
-      .data = data,
-      .state = UNIQUE_OK,
-      .file = NULL,
-      .line = 0,
-  };
+#define Unique(T) struct { bool moved; T* data; }
+
+#define unique_alloc(T)  {.data = calloc(1, sizeof(T)), .moved = false}
+#define unique_free(ptr)                                                                           \
+    do {                                                                                           \
+        _unique_check(ptr, "unique_free");                                                         \
+        free((ptr).data);                                                                          \
+        (ptr).data = NULL;                                                                         \
+        (ptr).moved = true;                                                                        \
+    } while (0)
+
+#define unique_get(ptr) (_unique_check(ptr, "unique_get"), (ptr).data)
+#define unique_move(ptr) {.data = (_unique_check(ptr, "unique_move"), (ptr).moved = true, (ptr).data)}
+
+// USER CODE
+
+typedef Unique(int) UniqueInt;
+
+// a function that creates an object
+UniqueInt make_int(int value) {
+    UniqueInt i = unique_alloc(int);
+    *unique_get(i) = value;
+    return (UniqueInt)unique_move(i);
 }
 
-#define ASSERT(cond, msg, ptr, file, line, action)                             \
-  {                                                                            \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "%s:%d: '%s' failed: %s: %s:%d\n", file, line, action,   \
-              msg, ptr->file, ptr->line);                                      \
-      abort();                                                                 \
-    }                                                                          \
-  }
-
-static void _unique_check(UniquePtr *ptr, const char *action, const char *file,
-                          int line) {
-  ASSERT(ptr->state != UNIQUE_USED, "Pointer in use", ptr, file, line, action);
-  ASSERT(ptr->state != UNIQUE_MOVED, "UniquePtr was moved", ptr, file, line,
-         action);
-  ASSERT(ptr->state != UNIQUE_FREE, "UniquePtr was moved!", ptr, file, line,
-         action);
-  ASSERT(ptr->state == UNIQUE_OK, "Something went wrong!", ptr, file, line,
-         action);
+// a function that will take ownership
+void take_int(UniqueInt ptr) {
+    printf("%d\n", *unique_get(ptr));
+    unique_free(ptr);
 }
-
-#define unique_free(ptr) _unique_free(ptr, __FILE__, __LINE__)
-#define unique_move(ptr) _unique_move(ptr, __FILE__, __LINE__)
-#define unique_get(ptr) _unique_get(ptr, __FILE__, __LINE__)
-
-void _unique_free(UniquePtr *ptr, const char *file, int line) {
-  _unique_check(ptr, "free", file, line);
-  ptr->file = file;
-  ptr->line = line;
-  ptr->state = UNIQUE_FREE;
-  free(ptr->data);
-}
-
-void *_unique_get(UniquePtr *ptr, const char *file, int line) {
-  _unique_check(ptr, "get", file, line);
-  ptr->state = UNIQUE_USED;
-  ptr->line = line;
-  ptr->file = file;
-  return ptr->data;
-}
-
-void unique_release(UniquePtr *ptr) { ptr->state = UNIQUE_OK; }
-
-UniquePtr _unique_move(UniquePtr *ptr, const char *file, int line) {
-  _unique_check(ptr, "move", file, line);
-  UniquePtr new_ptr = *ptr;
-  ptr->state = UNIQUE_MOVED;
-  ptr->line = line;
-  ptr->file = file;
-  new_ptr.state = UNIQUE_OK;
-  return new_ptr;
-}
-
-int *make_int(int value) {
-  int *i = malloc(sizeof(int));
-  *i = value;
-  return i;
-}
-
-int add(UniquePtr ptr, int value) {
-  int result = *(int *)unique_get(&ptr) + value;
-  unique_release(&ptr);
-  unique_free(&ptr);
-  return result;
-}
-
-int add_ip(const int *ptr, int value) { return *ptr + value; }
 
 int main(void) {
-  const int my_val = 420;
-  UniquePtr my_int = make_unique(make_int(my_val));
+    // create unique pointer
+    UniqueInt my_uptr = make_int(420);
 
-  printf("%d\n", *(int *)unique_get(&my_int));
-  unique_release(&my_int);
+    // move unique pointer
+    take_int((UniqueInt)unique_move(my_uptr));
 
-  // printf("%d\n", add(unique_move(&my_int), 1));
-  printf("%d\n", add_ip(unique_get(&my_int), 2));
-  unique_release(&my_int);
-
-  unique_free(&my_int);
+    // all these errors get catched!
+    // *unique_get(my_uptr) = 420;                // use after free
+    // take_int((UniqueInt)unique_move(my_uptr)); // multiple moves
+    // unique_free(my_uptr);                      // double free
 }
